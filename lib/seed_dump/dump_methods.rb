@@ -43,7 +43,7 @@ class SeedDump
               when Range
                 range_to_string(value)
               else
-                value
+                value.respond_to?(:to_s) ? value.to_s : value
               end
 
       value.inspect
