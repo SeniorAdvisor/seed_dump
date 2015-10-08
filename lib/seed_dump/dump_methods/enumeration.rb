@@ -66,7 +66,7 @@ class SeedDump
         if options[:batch_size].present?
           options[:batch_size].to_i
         else
-          options[:export_ids].present? ? 1 : 1000
+          1000
         end
       end
     end

@@ -27,7 +27,7 @@ class SeedDump
 
       open_character, close_character = options[:import] ? ['[', ']'] : ['{', '}']
 
-      "#{open_character}#{attribute_strings.join(", ")}#{close_character}"
+      "#{options[:export_ids].present? ? options[:method] : nil} #{open_character}#{attribute_strings.join(", ")}#{close_character}#{options[:export_ids].present? ? ', :without_protection => true )': nil}"
     end
 
     def dump_attribute_new(attribute, value, options)
@@ -79,14 +79,13 @@ class SeedDump
                            else
                              :enumerable_enumeration
                            end
-
+      options[:method] = "#{model_for(records)}.#{method}("
       send(enumeration_method, records, io, options) do |record_strings, last_batch|
         if options[:export_ids].present?
-          io.write("#{model_for(records)}.#{method}(")
-          record_strings << ":without_protection => true "
+          io.write(record_strings.join("\n  "))
+        else
+          io.write(record_strings.join(",\n  "))
         end
-        io.write(record_strings.join(",\n  "))
-        io.write("\n)\n") if options[:export_ids].present?
         io.write(",\n  ") if !last_batch && !options[:export_ids].present?
       end
 
