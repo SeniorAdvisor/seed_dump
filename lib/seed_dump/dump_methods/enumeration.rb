@@ -9,7 +9,7 @@ class SeedDump
         end
 
         num_of_batches, batch_size, last_batch_size = batch_params_from(records, options)
-
+        puts "num of batches: #{num_of_batches} batch:size: #{batch_size} last_batch_size: #{last_batch_size}"
         # Loop through each batch
         (1..num_of_batches).each do |batch_number|
 
@@ -36,7 +36,6 @@ class SeedDump
         num_of_batches, batch_size = batch_params_from(records, options)
 
         record_strings = []
-
         batch_number = 1
 
         records.each_with_index do |record, i|
@@ -67,7 +66,7 @@ class SeedDump
         if options[:batch_size].present?
           options[:batch_size].to_i
         else
-          1000
+          options[:export_ids].present? ? 1 : 1000
         end
       end
     end

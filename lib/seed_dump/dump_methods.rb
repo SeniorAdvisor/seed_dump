@@ -45,7 +45,6 @@ class SeedDump
               else
                 value.respond_to?(:to_s) ? value.to_s : value
               end
-
       value.inspect
     end
 
@@ -66,14 +65,14 @@ class SeedDump
     end
 
     def write_records_to_io(records, io, options)
-      options[:exclude] ||= [:id, :created_at, :updated_at]
+      options[:exclude] ||= options[:export_ids].present? ? [:created_at, :updated_at] : [:id, :created_at, :updated_at]
 
       method = options[:import] ? 'import' : 'create!'
-      io.write("#{model_for(records)}.#{method}(")
+      io.write("#{model_for(records)}.#{method}(") unless options[:export_ids].present?
       if options[:import]
-        io.write("[#{attribute_names(records, options).map {|name| name.to_sym.inspect}.join(', ')}], ")
+        io.write("[#{attribute_names(records, options).map {|name| name.to_sym.inspect}.join(', ')}], ") unless options[:export_ids].present?
       end
-      io.write("[\n  ")
+      io.write("[\n  ") unless options[:export_ids].present?
 
       enumeration_method = if records.is_a?(ActiveRecord::Relation) || records.is_a?(Class)
                              :active_record_enumeration
@@ -82,12 +81,16 @@ class SeedDump
                            end
 
       send(enumeration_method, records, io, options) do |record_strings, last_batch|
+        if options[:export_ids].present?
+          io.write("#{model_for(records)}.#{method}(")
+          record_strings << ":without_protection => true "
+        end
         io.write(record_strings.join(",\n  "))
-
-        io.write(",\n  ") unless last_batch
+        io.write("\n)\n") if options[:export_ids].present?
+        io.write(",\n  ") if !last_batch && !options[:export_ids].present?
       end
 
-      io.write("\n])\n")
+      io.write("\n])\n") unless options[:export_ids].present?
 
       if options[:file].present?
         nil
