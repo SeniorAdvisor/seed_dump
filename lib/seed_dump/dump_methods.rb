@@ -86,10 +86,18 @@ class SeedDump
         else
           io.write(record_strings.join(",\n  "))
         end
-        io.write(",\n  ") if !last_batch && !options[:export_ids].present?
+        if !last_batch && !options[:export_ids].present?
+          io.write(",\n  ")
+        else
+          io.write("\n  ")
+        end
       end
 
-      io.write("\n])\n") unless options[:export_ids].present?
+      if options[:export_ids].present?
+        io.write("\n")
+      else
+        io.write("\n])\n")
+      end
 
       if options[:file].present?
         nil
