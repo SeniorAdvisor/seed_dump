@@ -9,7 +9,6 @@ class SeedDump
         end
 
         num_of_batches, batch_size, last_batch_size = batch_params_from(records, options)
-        puts "num of batches: #{num_of_batches} batch:size: #{batch_size} last_batch_size: #{last_batch_size}"
         # Loop through each batch
         (1..num_of_batches).each do |batch_number|
 
